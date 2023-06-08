@@ -4,7 +4,7 @@ import glob
 
 class x_finished (Exception): pass
 
-paths = ["."] + os.environ.get ("PATH", "").split (";")
+paths = ["."] + [os.path.expandvars(p) for p in os.environ.get ("PATH", "").split (";")]
 exts = [e.lower () for e in os.environ.get ("PATHEXT", ".exe").split (";")]
 
 if __name__ == '__main__':
@@ -17,13 +17,16 @@ if __name__ == '__main__':
   if ext:
     exts = [ext]
 
-  try:
-    for path in paths:
-      for ext in exts:
-        filepath = os.path.join (path, "%s%s" % (base, ext))
-        filenames = glob.glob (filepath)
-        if filenames:
-          for filename in filenames:
-            print filename
-  except x_finished:
-    pass
+  paths_seen = set()
+  for path in paths:
+    if path.lower() in paths_seen:
+      continue
+    else:
+      paths_seen.add(path.lower())
+
+    for ext in exts:
+      filepath = os.path.join (path, "%s%s" % (base, ext))
+      filenames = glob.glob (filepath)
+      if filenames:
+        for filename in filenames:
+          print filename
