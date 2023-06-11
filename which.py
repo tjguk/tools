@@ -1,4 +1,4 @@
-#!python2
+#!python3
 import os, sys
 import glob
 
